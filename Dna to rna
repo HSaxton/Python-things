@@ -1,0 +1,18 @@
+def oneDnaToRna( c ):
+        if c == 'A':
+            return 'U'
+        elif c == 'T':
+            return 'A'
+        elif c == 'G':
+            return 'C'
+        elif c == 'C':
+            return 'G'
+        else:
+            return ''
+
+
+def transcribe(s):
+    if s == '':
+        return s
+    else:
+        return oneDnaToRna(s[0]) + transcribe(s[1:])
