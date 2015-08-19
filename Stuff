@@ -1,0 +1,182 @@
+from PIL import Image, ImageDraw
+
+
+def blockHead( im, startx, starty, endx, endy ):
+    images = Image.open(im)
+    draw = ImageDraw.Draw( images )
+    draw.rectangle([(startx,starty),(endx,endy)], fill= 0, outline= (0,0,0))
+    images.show()
+
+def invert( im ):
+    ''' Invert the colors in the input image, im '''
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    # Note that the previous 3 lines could be replaced by the single line:
+    # (width, height) = im.size()
+    # We will use this shorthand below.  Ask a tutor if you are confused.
+
+    for x in range( 0, width ):
+        for y in range( 0, height ):
+            (red, green, blue) = images.getpixel((x, y))
+            newRed = 255-red
+            newGreen = 255-green
+            newBlue = 255-blue
+            draw.point([(x, y)], (newRed, newGreen, newBlue))
+    images.show()
+
+def greyscale(im):
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    #(width, height) = im.size()
+    for x in range( 0, width ):
+        for y in range( 0, height ):
+            (red, green, blue) = images.getpixel((x, y))
+            newColor = ( red*.21 + green * .72 + blue * .07)
+            draw.point([(x, y)], (int(newColor), int(newColor), int(newColor)))
+    images.show()
+
+def binarize(im, thresh):
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+
+    for x in range( 0, width ):
+        for y in range( 0, height ):
+            (red, green, blue) = images.getpixel((x, y))
+            if (red + green + blue)/3.0 > thresh:
+                newRed = 255
+                newGreen = 255
+                newBlue = 255
+            else:
+                newRed = 0
+                newGreen = 0
+                newBlue = 0   
+            draw.point([(x, y)], (newRed, newGreen, newBlue))
+    images.show()
+
+
+    
+def mirrorVert(im):
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+
+    for x in range( width ):
+        for y in range( 0, height/2 ):
+             (red, green, blue) = images.getpixel((x, y))
+             images.putpixel((x,(height-1) - y),(red,green,blue))
+    images.show()
+
+def mirrorHoriz(im):
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+
+    for x in range( 0, width/2 ):
+        for y in range(height):
+             (red, green, blue) = images.getpixel((x, y))
+             images.putpixel(((width - 1)-x, y),(red,green,blue))
+    images.show()
+
+def flipVert(im):
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    for x in range(width):
+        for y in range(height / 2):
+             (red, green, blue) = images.getpixel((x, y))
+             (red2, green2, blue2) = images.getpixel((x, (height - 1) - y))
+             images.putpixel((x, y),(red2,green2,blue2))
+             images.putpixel((x, (height - 1) - y),(red,green,blue))
+    images.show()
+
+def flipHoriz(im):
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    for x in range(width/2):
+        for y in range(height):
+            (red, green, blue) = images.getpixel((x, y))
+            (red2, green2, blue2) = images.getpixel(((width - 1) - x, y))
+            images.putpixel((x, y),(red2,green2,blue2))
+            images.putpixel(((width -1) - x,  y),(red,green,blue))
+    images.show()
+
+def scale(im):
+    #Just scales to 50%
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    newIm = Image.new('RGB',(width / 2, height / 2), color = 0)
+    newDraw = ImageDraw.Draw(newIm)
+    for x in range(width / 2):
+        for y in range(height / 2):
+                (red, green, blue) = images.getpixel((x*2, y*2))
+                newIm.putpixel((x,y),(red,green,blue)) 
+    newIm.show()
+
+def blur(im,square):
+    #If square is 2, it blurs by 2*2 squares.. If square is 5, it blurs 5*5 squares
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    newIm = Image.new('RGB',(width, height), color = 0)
+    newDraw = ImageDraw.Draw(newIm)
+    for x in range(0,width,square):
+        for y in range(0,height,square):
+            newRed,newGreen,newBlue = 0,0,0
+            for a in range(x,x + square):
+                for b in range(y,y + square):
+                    if a < width and b < height:
+                        (red, green, blue) = images.getpixel((a,b))
+                        newRed,newGreen,newBlue = newRed + red,newGreen + green,newBlue+ blue
+            newestRed,newestGreen,newestBlue = newRed / (square * square),newGreen / (square * square) , newBlue / (square * square)           
+            newDraw.rectangle([(x,y),(x+(square - 1),y+(square-1))], fill =(newestRed,newestGreen,newestBlue), outline = (newestRed,newestGreen,newestBlue)) 
+    newIm.show()
+
+def randomGrid(im,n):
+    #n = grid size.. 4 = 4x4 grid 
+    images = Image.open(im)
+    draw = ImageDraw.Draw(images)
+    imsize = images.size
+    width = imsize[0]
+    height = imsize[1]
+    newIm = Image.new('RGB',(width, height), color = 0)
+    newDraw = ImageDraw.Draw(newIm)
+    for x in range(0,width,width/n):
+        for y in range(0,height,height/n):
+            newPiece = Image.new('RGB',(width/n, height/n), color = 0)
+            piecesize = newPiece.size
+            piecewidth = piecesize[0]
+            pieceheight = piecesize[1]
+            q = 0 
+            for a in range(x, width):
+                r = 0
+                q+=1 
+                for b in range(y,height):
+                    (red, green, blue) = images.getpixel((a,b))
+                    newPiece.putpixel((q,r),(red,green,blue))
+                    r+=1
+        newPiece.show()   
+
