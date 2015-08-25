@@ -1,0 +1,40 @@
+def numToBinary(N):
+    Y = N / 2
+    if N==0:
+        return '' 
+    elif N % 2 != 0:
+        return numToBinary(Y) + '1' 
+    else:
+        return numToBinary(Y) + '0'
+        
+
+def numToTc(N):
+    if N > 0:
+        print 'The number is not negative!'
+        return
+    if N < -128:
+        print 'The number will take over 8 bits!'
+        return
+    reversii = [] 
+    reversii = reversii + list(numToBinary(-N))
+    for x in range (8 - len(reversii)):
+        listy = '0'
+        reversii.reverse()
+        reversii.append(listy)
+        reversii.reverse()
+    for x in range (8):
+        if reversii[x] == '0':
+            reversii[x] = '1'
+        else:
+            reversii[x] = '0'
+    y = 7
+    if reversii[7] == '0':
+        reversii[7] = '1'
+    else:
+        while reversii[y] == '1':
+            reversii[y] = '0'
+            y-=1
+        reversii[y] = '1'
+        y = 0
+    gilbert = "".join(reversii)
+    return gilbert
