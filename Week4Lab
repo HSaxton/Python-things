@@ -1,3 +1,6 @@
+
+from PIL import Image, ImageDraw
+
 def numToBinary(N):
     Y = N / 2
     if N==0:
@@ -38,3 +41,91 @@ def numToTc(N):
         y = 0
     gilbert = "".join(reversii)
     return gilbert
+
+def addB(string1,string2):
+    addedNumber = []
+    number1 = list(string1)
+    number2 = list(string2)
+    carry = []
+    if len(number1) != len(number2):
+        if len(number1) < len(number2):
+            while len(number1) != len(number2):
+                number1.reverse()
+                number1.append('0')
+            number1.reverse()
+        else:
+            while len(number2) != len(number1):
+                number2.reverse()
+                number2.append('0')
+            number2.reverse()
+    addedNumber = addedNumber + number1 
+    for x in range (len(number1)-1,-1,-1):
+        if number1[x] == '0' and number2[x] == '0':
+            if len(carry) > 0:
+                addedNumber[x] = '1'
+                carry.remove(carry[0])
+            else:
+                addedNumber[x] = '0'
+        elif number1[x] == '1' and number2[x] == '1':
+            if len(carry) > 0:
+                addedNumber[x] = '1'
+            else:
+                addedNumber[x] = '0'
+                carry = carry + ['1']
+        else:
+            if len(carry) > 0:
+                addedNumber[x] = '0'
+            else:
+                addedNumber[x] = '1'
+    if len(carry) > 0:
+        addedNumber.reverse()
+        addedNumber.append('1')
+        addedNumber.reverse()
+    print len(carry)
+    finishedNumber = "".join(addedNumber)
+    return finishedNumber
+
+def mostSignificant2(num):
+    num = num >> 6
+    return num 
+
+def mostSignificantN(num,N):
+    if N < 1 or N > 8:
+        return
+    num = num >> 8 - N
+    return num
+
+def degradeColors2Bits(pic):
+  pic= Image.open(pic)
+  picCopy = Image.new('RGB', pic.size, (0, 0, 0))
+  for x in range(pic.size[0]):
+    for y in range(pic.size[1]):
+      (r,g,b) = pic.getpixel( (x, y) )
+      r = shift2BitsTo8(mostSignificant2( r ))
+      g = shift2BitsTo8(mostSignificant2( g ))
+      b = shift2BitsTo8(mostSignificant2( b ))
+      picCopy.putpixel( (x,y), ( r, g, b ) )
+  picCopy.show()
+
+def degradeColorsNBits(pic,N):
+  pic= Image.open(pic)
+  picCopy = Image.new('RGB', pic.size, (0, 0, 0))
+  for x in range(pic.size[0]):
+    for y in range(pic.size[1]):
+      (r,g,b) = pic.getpixel( (x, y) )
+      r = shiftNBitsTo8(mostSignificantN( r,N ),N)
+      g = shiftNBitsTo8(mostSignificantN( g,N ),N)
+      b = shiftNBitsTo8(mostSignificantN( b,N ),N)
+      picCopy.putpixel( (x,y), ( r, g, b ) )
+  picCopy.show()
+
+
+def shift2BitsTo8(num):
+    num = num << 6
+    return num
+
+def shiftNBitsTo8(num,N):
+    if N < 1 or N > 8 or num < 0:
+        return
+    num = num << 8 - N
+    return num
